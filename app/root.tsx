@@ -1,15 +1,28 @@
-import {
-  Links,
-  LiveReload,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration
-} from "remix";
-import type { MetaFunction } from "remix";
+import { Links, LiveReload, Outlet } from "remix";
 
-export const meta: MetaFunction = () => {
-  return { title: "New Remix App" };
+import type { LinksFunction } from "remix";
+
+import globalStylesUrl from "~/styles/global.css";
+import globalMediumStylesUrl from "~/styles/global-medium.css";
+import globalLargeStylesUrl from "~/styles/global-large.css";
+
+export const links: LinksFunction = () => {
+  return [
+    {
+      rel: "stylesheet",
+      href: globalStylesUrl,
+    },
+    {
+      rel: "stylesheet",
+      href: globalMediumStylesUrl,
+      media: "print, (min-width: 640px)",
+    },
+    {
+      rel: "stylesheet",
+      href: globalLargeStylesUrl,
+      media: "screen and (min-width: 1024px)",
+    },
+  ];
 };
 
 export default function App() {
@@ -17,15 +30,12 @@ export default function App() {
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <Meta />
+        <title>Remix: So great, it's funny!</title>
         <Links />
       </head>
       <body>
         <Outlet />
-        <ScrollRestoration />
-        <Scripts />
-        {process.env.NODE_ENV === "development" && <LiveReload />}
+        {process.env.NODE_ENV === "development" ? <LiveReload /> : null}
       </body>
     </html>
   );
