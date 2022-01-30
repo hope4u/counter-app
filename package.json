@@ -6,11 +6,13 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production remix build",
     "dev": "cross-env NODE_ENV=development run-p dev:*",
+    "durables": "run-p durables:*",
     "postinstall": "remix setup cloudflare-pages",
-    "esbuild:durables": "esbuild app/durables/* --outfile=durables/src/index.mjs --bundle",
+    "dev:build": "esbuild app/durables/* --outdir=durables/src/ --out-extension:.js=.mjs --watch",
+    "dev:publish": "cd durables && npm run watch",
     "wrangler:help": "wrangler paged dev help",
     "dev:remix": "remix watch",
-    "dev:wrangler": "wrangler pages dev ./public --watch ./build --kv TEST --do JOKES=JokesDurable@jokes-durable",
+    "dev:wrangler": "wrangler pages dev ./public --watch ./build",
     "start": "npm run dev:wrangler"
   },
   "dependencies": {

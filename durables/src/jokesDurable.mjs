@@ -1,4 +1,4 @@
-const seedJokes = [
+export const seedJokes = [
   {
     id: "1",
     name: "Road worker",
@@ -48,12 +48,31 @@ async function handleRequest(request, env) {
   let id = env.JOKES.idFromName("A");
   let obj = env.JOKES.get(id);
   let body = {
-    query: {},
-    function: "getJokes"
+    query: "",
+    operationName: "getJokes"
   };
-  let resp = await obj.fetch("https://", { body: JSON.stringify(body) });
+  let resp = await fetchDurable(env, body);
   return new Response(resp.body);
 }
+function fetchDurable(env, body = {}) {
+  const init = { method: "POST", body: JSON.stringify(body) };
+  if (env.JOKES) {
+    const id = env.JOKES.idFromName("A");
+    const obj = env.JOKES.get(id);
+    return obj.fetch("https://graphql", init);
+  } else {
+    return fetch("https://jokes_durable.hope4u.workers.dev", init);
+  }
+}
+export const getJokes = async ({ context: { env } }) => {
+  let body = {
+    query: "",
+    operationName: "getJokes"
+  };
+  const resp = await fetchDurable(env, body);
+  const { jokes } = await resp.json();
+  return jokes;
+};
 export class JokesDurable {
   constructor(state, env) {
     this.state = state;
@@ -61,10 +80,9 @@ export class JokesDurable {
   }
   async fetch(request) {
     let url = new URL(request.url);
-    let query = {};
-    let body = await request.json();
-    if ((body == null ? void 0 : body.function) === "getJokes") {
-      return new Response(JSON.stringify(seedJokes));
+    let { operationName } = await request.json();
+    if (operationName === "getJokes") {
+      return new Response(JSON.stringify({ jokes: seedJokes }));
     }
     return new Response("Woops", { status: 404 });
   }

@@ -1,8 +1,16 @@
+import { DataFunctionArgs } from "@remix-run/server-runtime";
+
 export type Joke = {
   jokee?: string;
   id: string;
   name: string;
   content: string;
+};
+
+export type JokeRequest = {
+  query: Object;
+  operationName: String;
+  variables: Object;
 };
 
 export const seedJokes = [
@@ -58,14 +66,35 @@ async function handleRequest(request: Request, env: Env) {
   let obj = env.JOKES.get(id);
 
   let body = {
-    query: {},
-    function: "getJokes",
+    query: "",
+    operationName: "getJokes",
   };
-
-  let resp = await obj.fetch("https://", { body: JSON.stringify(body) });
-
+  let resp = await fetchDurable(env, body);
   return new Response(resp.body);
 }
+
+function fetchDurable(env: Env, body = {}) {
+  const init =  { method: "POST", body: JSON.stringify(body) };
+
+  if (env.JOKES) {
+    const id = env.JOKES.idFromName("A");
+    const obj = env.JOKES.get(id);
+    return obj.fetch("https://graphql", init);
+  } else {
+    return fetch("https://jokes_durable.hope4u.workers.dev", init);
+  }
+}
+
+export const getJokes = async ({ context: { env } }: DataFunctionArgs) => {
+  let body = {
+    query: "",
+    operationName: "getJokes",
+  };
+
+  const resp = await fetchDurable(env, body);
+  const { jokes } = await resp.json();
+  return jokes;
+};
 
 export class JokesDurable {
   jokee?: string;
@@ -81,11 +110,10 @@ export class JokesDurable {
   async fetch(request: Request) {
     // Apply requested action.
     let url = new URL(request.url);
-    let query = {};
-    let body = await request.json();
+    let { operationName } = await request.json();
 
-    if (body?.function === "getJokes") {
-      return new Response(JSON.stringify(seedJokes));
+    if (operationName === "getJokes") {
+      return new Response(JSON.stringify({ jokes: seedJokes }));
     }
 
     return new Response("Woops", { status: 404 });

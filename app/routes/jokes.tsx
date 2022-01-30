@@ -1,6 +1,6 @@
 import { Outlet, Link, useLoaderData } from "remix";
 import stylesUrl from "~/styles/jokes.css";
-import { JokesDurable, seedJokes } from "~/durables/jokesDurable";
+import { getJokes, seedJokes } from "~/durables/jokesDurable";
 
 // types
 import type { LinksFunction, LoaderFunction } from "remix";
@@ -16,30 +16,12 @@ export const links: LinksFunction = () => {
 };
 
 export const loader: LoaderFunction = async (args) => {
-  const data = { jokes: seedJokes };
-
-
-
-  console.log(args.context.env);
-
-  let id = JOKES.idFromName("A");
-  let obj = JOKES.get(id);
-
-  let body = {
-    query: {},
-    function: "getJokes",
-  };
-
-  let resp = await obj.fetch("https://", { body: JSON.stringify(body) });
-
-  console.log(resp)
-
-  return resp;
+  let jokes = await getJokes(args);
+  return {jokes};
 };
 
 export default function JokesRoute() {
   let data = useLoaderData();
-
   return (
     <div className="jokes-layout">
       <header className="jokes-header">

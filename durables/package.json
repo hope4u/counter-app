@@ -3,11 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
-  "module": "./src/jokesDurable.mjs",
+  "module": "./src/index.mjs",
   "scripts": {
-    "publish": "npx wrangler publish"
+    "publish": "npx wrangler publish",
+    "watch": "npm-watch"
+  },
+  "watch": {
+    "publish": "./src/*.mjs"
   },
   "devDependencies": {
-    "@cloudflare/wrangler": "^1.19.5"
+    "@cloudflare/wrangler": "^1.19.5",
+    "npm-watch": "^0.11.0"
+  },
+  "dependencies": {
   }
 }
