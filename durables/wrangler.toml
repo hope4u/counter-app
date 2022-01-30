@@ -1,0 +1,19 @@
+name = "jokes_durable"
+type = "javascript"
+workers_dev = true
+compatibility_date = "2021-11-17"
+account_id = "3f61d3dac05f45165ab41d3b2206fe3e"
+
+[build.upload]
+dir = "src"
+format = "modules"
+main = "./jokesDurable.mjs"
+
+[durable_objects]
+bindings = [
+  { name = "JOKES", class_name = "JokesDurable" }
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["JokesDurable"]

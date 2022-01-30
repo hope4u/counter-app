@@ -1,11 +1,20 @@
+import { useLoaderData } from "remix";
+import { seedJokes } from "~/durables/jokesDurable";
+
+import type { LoaderFunction } from "remix";
+
+export const loader: LoaderFunction = ({ params }) => {
+  const jokeId = params.jokeId;
+  const joke = seedJokes.find(({ id }) => id === params.jokeId);
+  return joke;
+};
+
 export default function JokeRoute() {
+  let joke = useLoaderData();
   return (
     <div>
-      <p>Here's your hilarious joke:</p>
-      <p>
-        Why don't you find hippopotamuses hiding in trees? They're really good
-        at it.
-      </p>
+      <p>{joke.name}</p>
+      <p>{joke.content}</p>
     </div>
   );
 }

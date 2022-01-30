@@ -4,7 +4,11 @@ import { createPagesFunctionHandler } from "@remix-run/cloudflare-pages";
 import * as build from "../build";
 
 const handleRequest = createPagesFunctionHandler({
-  build
+  build,
+  getLoadContext(context) {
+    console.log(context.env)
+    return { env: context.env };
+  },
 });
 
 export function onRequest(context) {
